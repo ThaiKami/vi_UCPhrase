@@ -1,2 +1,2 @@
-# vi_UCPhrase
-I am trying to apply UCphrase to vietnamese, let's see how that goes, shall we ?
+# kp_ucphase
+i try to apply ucphase to VNmese, let's see how it goes

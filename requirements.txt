@@ -1,0 +1,12 @@
+nltk
+ipdb
+torch
+scispacy
+orjson
+Cython
+inflect
+scispacy
+termcolor
+Unidecode
+transformers
+stop-words
