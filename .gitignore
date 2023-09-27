@@ -13,4 +13,5 @@ src/_tmp*.py
 **/__pycache__/
 *Icon?
 *__pycache__
-
+*/not_pushing/*
+*env*/
