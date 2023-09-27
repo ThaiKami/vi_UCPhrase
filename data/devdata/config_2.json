@@ -1,10 +1,10 @@
 {
     "lm_name": "/home/thaikami/kp_ucphase/src/phobert-base-v2-G",
     "path_test": "./fbdata/fbdata.test.jsonl",
-    "path_train": "./fbdata/fbdata.train.jsonl",
+    "path_train": "./fbdata/newsdata.train.jsonl",
     "path_phrase": "/home/thaikami/codes/UCPhrase-exp/data/wiki_quality.txt",
     "path_stopwords": "/home/thaikami/kp_ucphase/data/stopwords.txt",
-    "kp_num_candidates_per_doc": 3.5,
+    "kp_num_candidates_per_doc": 5,
     "path_tagging_docs": "./standard/devdata.tagging.docs.jsonl",
     "paths_tagging_human": [
         "./standard/devdata.tagging.human_0.json",

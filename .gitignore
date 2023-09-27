@@ -6,9 +6,11 @@ sftp-config.json
 experiments*
 data/*/standard*
 data/*/fbdata*
+data/*/newsdata*
 tmp*
 .vscode
 src/_tmp*.py
 **/__pycache__/
 *Icon?
 *__pycache__
+
