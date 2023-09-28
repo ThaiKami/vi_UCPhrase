@@ -5,7 +5,6 @@ scispacy
 orjson
 Cython
 inflect
-scispacy
 termcolor
 Unidecode
 transformers

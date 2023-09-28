@@ -7,7 +7,7 @@ from tqdm import tqdm
 from pathlib import Path
 from consts import roberta_tokens_to_str, phobert_tokens_to_str
 
-PUNCS = set(string.punctuation) - {"-"}
+PUNCS = set(string.punctuation) - {"-"} - {"@"}
 c = consts_class()
 
 
