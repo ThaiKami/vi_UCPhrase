@@ -49,7 +49,7 @@ class Preprocessor:
 
         tokenized_doc = {
             "_id_": docid,
-            "sents": ["".join(tokens) for tokens in cleaned_tokenized_sents],
+            "sents": [" ".join(tokens) for tokens in cleaned_tokenized_sents],
         }
 
         tokenized_id_doc = {"_id_": doc["_id_"], "sents": []}
@@ -59,6 +59,7 @@ class Preprocessor:
             ]  # the indices of start of words
             if phobert:
                 tokens = remove_G_TOKEN(tokens)
+                
             ids = c.LM_TOKENIZER.convert_tokens_to_ids(tokens)
             tokenized_id_doc["sents"].append({"ids": ids, "widxs": widxs})
         return tokenized_doc, tokenized_id_doc

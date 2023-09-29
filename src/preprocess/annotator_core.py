@@ -9,7 +9,7 @@ from preprocess.preprocess import Preprocessor
 from preprocess.annotator_base import BaseAnnotator
 
 consts = consts()
-MINCOUNT = 4 
+MINCOUNT = 4
 MINGRAMS = 4
 MAXGRAMS = consts.MAX_WORD_GRAM
 
@@ -24,11 +24,15 @@ def is_valid_ngram(ngram: list):
         # if not token or token in STPWD_SET or token.isdigit():
         if not token or token in STPWD_SET:
             return False
+    
     charset = set(" ".join(ngram))
+
     if not charset or (charset & (PUNCS_SET)):
         return False
-    # if ngram[0].startswith("-") or ngram[-1].endswith("-"):
-    #     return False
+    if not charset:
+        return False
+    if ngram[0].startswith("-") or ngram[-1].endswith("-"):
+        return False
     return True
 
 

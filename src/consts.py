@@ -41,7 +41,7 @@ class consts:
         self.GPT_TOKEN = "Ġ"
         self.LM_NAME = self.DATA_CONFIG.lm_name
         self.LM_NAME_SUFFIX = self.LM_NAME.split("/")[-1]
-        self.DEVICE = utils.get_device(0)
+        self.DEVICE = utils.get_device(1)
         self.LM_MODEL = (
             transformers.AutoModel.from_pretrained(self.LM_NAME).eval().to(self.DEVICE)
         )
@@ -54,7 +54,7 @@ class consts:
 
         # settings
         self.MAX_SENT_LEN = 64
-        self.MAX_WORD_GRAM = 8
+        self.MAX_WORD_GRAM = 5
         self.MAX_SUBWORD_GRAM = 10
         self.NEGATIVE_RATIO = 1
 

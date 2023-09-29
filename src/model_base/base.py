@@ -154,8 +154,8 @@ class BaseModel(nn.Module):
             if use_tqdm
             else predicted_docs
         )
-        threshold_l = 0.0
-        threshold_r = 1.0
+        threshold_l = 8.0
+        threshold_r = 8.0
         min_average_num_cands = expected_num_cands_per_doc - 0.5
         max_average_num_cands = expected_num_cands_per_doc + 0.5
         for _ in range(20):
