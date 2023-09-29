@@ -54,12 +54,12 @@ class consts:
 
         # settings
         self.MAX_SENT_LEN = 64
-        self.MAX_WORD_GRAM = 5
+        self.MAX_WORD_GRAM = 8
         self.MAX_SUBWORD_GRAM = 10
         self.NEGATIVE_RATIO = 1
 
         # multiprocessing
-        self.NUM_CORES = 16
+        self.NUM_CORES = 128
 
 
 def parse_args():

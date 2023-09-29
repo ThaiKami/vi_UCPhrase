@@ -49,7 +49,7 @@ class Preprocessor:
 
         tokenized_doc = {
             "_id_": docid,
-            "sents": [" ".join(tokens) for tokens in cleaned_tokenized_sents],
+            "sents": ["".join(tokens) for tokens in cleaned_tokenized_sents],
         }
 
         tokenized_id_doc = {"_id_": doc["_id_"], "sents": []}

@@ -9,25 +9,26 @@ from preprocess.preprocess import Preprocessor
 from preprocess.annotator_base import BaseAnnotator
 
 consts = consts()
-MINCOUNT = 2
-MINGRAMS = 2
+MINCOUNT = 4 
+MINGRAMS = 4
 MAXGRAMS = consts.MAX_WORD_GRAM
 
 
-PUNCS_SET = set(string.punctuation) - {"-"}
+PUNCS_SET = set(string.punctuation) - {"-"} - {"@"}
 STPWD_SET = set(utils.TextFile.readlines(consts.DATA_CONFIG.path_stopwords))
-
+# STPWD_SET = set()
 
 @functools.lru_cache(maxsize=100000)
 def is_valid_ngram(ngram: list):
     for token in ngram:
-        if not token or token in STPWD_SET or token.isdigit():
+        # if not token or token in STPWD_SET or token.isdigit():
+        if not token or token in STPWD_SET:
             return False
-    charset = set("".join(ngram))
+    charset = set(" ".join(ngram))
     if not charset or (charset & (PUNCS_SET)):
         return False
-    if ngram[0].startswith("-") or ngram[-1].endswith("-"):
-        return False
+    # if ngram[0].startswith("-") or ngram[-1].endswith("-"):
+    #     return False
     return True
 
 
@@ -46,7 +47,7 @@ class CoreAnnotator(BaseAnnotator):
         for i_sent, (sent, sent_dict) in enumerate(
             zip(tokenized_doc["sents"], tokenized_id_doc["sents"])
         ):
-            tokens = sent.lower().split()
+            tokens = sent.split()
             widxs = sent_dict["widxs"]
             num_words = len(widxs)
             widxs.append(len(tokens))  # for convenience
@@ -55,7 +56,7 @@ class CoreAnnotator(BaseAnnotator):
                     l_idx = widxs[i_word]
                     r_idx = widxs[i_word + n] - 1
                     ngram = tuple(tokens[l_idx : r_idx + 1])
-                    ngram = tuple("".join(ngram).split(consts.GPT_TOKEN.lower())[1:])
+                    ngram = tuple("".join(ngram).split(consts.GPT_TOKEN)[1:])
                     if is_valid_ngram(ngram):
                         phrase = " ".join(ngram)
                         phrase2cnt[phrase] += 1
@@ -71,6 +72,7 @@ class CoreAnnotator(BaseAnnotator):
                     break
             if not has_longer_pattern and len(p.split()) <= MAXGRAMS:
                 cleaned_phrases.add(p)
+                
         phrase2instances = {p: phrase2instances[p] for p in cleaned_phrases}
 
         return phrase2instances

@@ -33,7 +33,7 @@ class EmbedTrainer:
         random.shuffle(batches)
         valid_batches = batches[:num_valid]
         train_batches = batches[num_valid:]
-
+        
         best_epoch = -1
         best_valid_f1 = -1.0
         for epoch in range(1, num_epochs + 1):
