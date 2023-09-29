@@ -1,6 +1,6 @@
 import ipdb
 import utils
-from consts import consts
+import consts
 from functools import lru_cache
 from tqdm import tqdm
 from pathlib import Path
@@ -9,7 +9,7 @@ from nltk.stem.snowball import SnowballStemmer
 import string
 PUNCS = set(string.punctuation) - {'-'}
 STEMMER = SnowballStemmer('porter', ignore_stopwords=False)
-c = consts()
+
 
 @lru_cache(maxsize=100000)
 def STEM_WORD(w):
@@ -23,11 +23,11 @@ class Evaluator:
 
     def evaluate(self, path_doc2cands):
         utils.Log.info(f'[Eval] {path_doc2cands}')
-        doc2golds = c.STEM_DOC2REFS
+        doc2golds = consts.STEM_DOC2REFS
 
         path_doc2cands = Path(path_doc2cands)
         doc2cands = utils.Json.load(path_doc2cands)
-        assert set(doc2cands.keys()) - c.DOCIDS_WITH_GOLD == set(doc2golds.keys()) - c.DOCIDS_WITH_GOLD
+        assert set(doc2cands.keys()) - consts.DOCIDS_WITH_GOLD == set(doc2golds.keys()) - consts.DOCIDS_WITH_GOLD
         num_cands = 0
         info_list = []
         macro_recalls = []
@@ -36,7 +36,7 @@ class Evaluator:
         for doc in tqdm(sorted(doc2golds.keys()), ncols=100, desc='eval'):
             golds: set = doc2golds[doc]
             if not golds:
-                assert doc not in c.DOCIDS_WITH_GOLD, ipdb.set_trace()
+                assert doc not in consts.DOCIDS_WITH_GOLD, ipdb.set_trace()
                 continue
 
             cands = doc2cands[doc]
@@ -86,8 +86,8 @@ class SentEvaluator:
         for splitsent in sent:
             _tokens = splitsent['tokens']
             if len(_tokens) > 0:
-                if not _tokens[0].startswith(c.GPT_TOKEN):
-                    _tokens[0] = c.GPT_TOKEN + _tokens[0]
+                if not _tokens[0].startswith(consts.GPT_TOKEN):
+                    _tokens[0] = consts.GPT_TOKEN + _tokens[0]
             _spans = splitsent['spans']
             _spans = [(_span[0] + len(tokens), _span[1] + len(tokens) + 1, _span[2]) for _span in _spans]
             tokens.extend(_tokens)
@@ -95,17 +95,17 @@ class SentEvaluator:
         span_start_to_offset = {}
         span_end_to_offset = {}
         n_tokens = []
-        assert len(tokens) == 0 or tokens[0].startswith(c.GPT_TOKEN)
+        assert len(tokens) == 0 or tokens[0].startswith(consts.GPT_TOKEN)
         n_chars = 0
         span_start_to_offset[0] = 0
         for i, token in enumerate(tokens):
-            if token.startswith(c.GPT_TOKEN):
+            if token.startswith(consts.GPT_TOKEN):
                 if len(n_tokens) != 0:
                     n_chars += len(n_tokens[-1])
                     span_end_to_offset[i] = n_chars
                     n_chars += 1
                     span_start_to_offset[i] = n_chars
-                n_tokens.append(token.replace(c.GPT_TOKEN, ''))
+                n_tokens.append(token.replace(consts.GPT_TOKEN, ''))
             else:
                 n_tokens[-1] = n_tokens[-1] + token
         if len(n_tokens) != 0:

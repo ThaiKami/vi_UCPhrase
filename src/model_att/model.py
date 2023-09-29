@@ -4,12 +4,11 @@ import numpy
 import torch.nn as nn
 import torch.nn.functional as F
 from tqdm import tqdm
-from consts import consts
+from consts import DEVICE
 from pathlib import Path
 from model_base import BaseModel
 from model_att.feature import FeatureExtractor
 
-consts = consts()
 
 class AttmapModel(BaseModel):
     def __init__(self, max_num_subwords, num_BERT_layers, model_dir, kernel_size=2, out_channels=16):

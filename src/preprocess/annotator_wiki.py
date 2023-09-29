@@ -1,11 +1,9 @@
 import utils
-from consts import consts
+import consts
 from tqdm import tqdm
 from pathlib import Path
 from match import KeywordProcessor
 from preprocess.annotator_base import BaseAnnotator
-
-consts = consts()
 
 MARK_PREFIX = '<23fwa<'
 MARK_SUFFIX = '>23fwa>'
@@ -24,8 +22,7 @@ class WikiAnnotator(BaseAnnotator):
         phrases = utils.TextFile.readlines(self.path_standard_phrase)
         phrases = [' ' + p for p in phrases if len(p.split()) > 1]  # for Roberta tokenizer
         tqdm_phrases = tqdm(phrases, ncols=100, desc=f'[WikiAnno] {self.path_standard_phrase}')
-        # tokenized_phrases = [' '.join(consts.LM_TOKENIZER.tokenize(phrase, add_special_tokens=False)) for phrase in tqdm_phrases]
-        tokenized_phrases = [' '.join(consts.LM_TOKENIZER.tokenize(phrase)) for phrase in tqdm_phrases]
+        tokenized_phrases = [' '.join(consts.LM_TOKENIZER.tokenize(phrase, add_special_tokens=False)) for phrase in tqdm_phrases]
         utils.TextFile.dumplist(tokenized_phrases, self.path_tokenized_phrase)
         return self.path_tokenized_phrase
 

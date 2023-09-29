@@ -1,0 +1,6 @@
+{
+    "model": "emb",
+    "annotator": "core",
+    "finetune": true,
+    "threshold": 0.1
+}

@@ -1,4 +1,4 @@
-pip3 install -r ./requirements.txt
+pip install -r ./requirements.txt
 
 cd ./src/match
 bash build.sh
