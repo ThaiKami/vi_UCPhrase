@@ -101,7 +101,7 @@ class Experiment:
             test_preprocessor = Preprocessor(
                 path_corpus=self.data_config.path_test,
                 num_cores=consts.NUM_CORES,
-                use_cache=True)
+                use_cache=False)
 
         test_preprocessor.tokenize_corpus()
 

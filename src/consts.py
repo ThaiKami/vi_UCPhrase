@@ -65,14 +65,17 @@ HTML_EP = '</span>'
 
 # settings
 MAX_SENT_LEN = 64
-MAX_WORD_GRAM = 10
-MAX_SUBWORD_GRAM = 10
+MAX_WORD_GRAM = 20
+MAX_SUBWORD_GRAM = 2
 NEGATIVE_RATIO = 1
 
 # multiprocessing
-NUM_CORES = 16
+NUM_CORES = 64
 torch.set_num_threads(NUM_CORES)
 
 
 def roberta_tokens_to_str(tokens):
     return ''.join(tokens).replace(GPT_TOKEN, ' ').strip()
+
+def phobert_tokens_to_str(tokens):
+    return ' '.join(tokens).replace(GPT_TOKEN, ' ').strip()

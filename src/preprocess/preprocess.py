@@ -1,9 +1,10 @@
 import utils
+from utils import remove_punctuation, remove_emoji
 import consts
 from tqdm import tqdm
 from pathlib import Path
 from multiprocessing import Pool
-
+from pyvi import ViTokenizer
 
 class Preprocessor:
 
@@ -27,7 +28,7 @@ class Preprocessor:
         self.path_tokenized_id_corpus = self.dir_preprocess / f'tokenized.id.{self.path_corpus.name}'
 
     @staticmethod
-    def _par_tokenize_doc(doc):
+    def _par_tokenize_doc(doc, is_phobert: bool = True):
         docid = doc['_id_']
         sents = doc['sents']
 
@@ -38,8 +39,14 @@ class Preprocessor:
         # tokenized_sents = [consts.LM_TOKENIZER.tokenize(' ' + s, add_special_tokens=False) for s in sents]
 
         # NOTE: This is mine
+        if is_phobert:
+            sents = [remove_punctuation(s) for s in sents]
+            sents = [ViTokenizer.tokenize(s) for s in sents]
+            sents = [remove_emoji(s) for s in sents]
+            
         tokenized_sents = [consts.LM_TOKENIZER.tokenize(s) for s in sents]
-        tokenized_sents = [utils.add_G_TOKEN(s) for s in tokenized_sents]
+        if is_phobert:
+            tokenized_sents = [utils.add_G_TOKEN(s) for s in tokenized_sents]
 
         cleaned_tokenized_sents = []
         for tokens in tokenized_sents:

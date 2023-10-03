@@ -135,7 +135,7 @@ def remove_emoji(string):
 
 def remove_punctuation(text):
     # Create a translation table to remove punctuation characters
-    translator = str.maketrans("", "", string.punctuation.replace("_", ""))
+    translator = str.maketrans("", "", string.punctuation.replace("_", "").replace("@", ""))
 
     # Use the translate method to remove punctuation
     text_without_punctuation = text.translate(translator)

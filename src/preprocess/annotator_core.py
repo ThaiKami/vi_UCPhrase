@@ -7,27 +7,42 @@ from collections import Counter
 from collections import defaultdict
 from preprocess.preprocess import Preprocessor
 from preprocess.annotator_base import BaseAnnotator
+import time
 
 
-MINCOUNT = 3
-MINGRAMS = 3
+MINCOUNT = 2
+MINGRAMS = 2
 MAXGRAMS = consts.MAX_WORD_GRAM
 
 
-PUNCS_SET = set(string.punctuation) - {'-'}
+PUNCS_SET = set(string.punctuation) - {'-'} - {'@'} - {'_'}
 STPWD_SET = set(utils.TextFile.readlines('../data/stopwords.txt'))
+STPWD_SET = {}
+
 
 
 @functools.lru_cache(maxsize=100000)
-def is_valid_ngram(ngram: list):
+def is_valid_ngram(ngram: list, print_out: bool = True):
     for token in ngram:
         if not token or token in STPWD_SET or token.isdigit():
+            if print_out:
+                if token in STPWD_SET:
+                    print(f"This n-gram has stws: {ngram}")
+                else:
+                    print(f"This n-gram has digits: {ngram}")
             return False
     charset = set(''.join(ngram))
     if not charset or (charset & (PUNCS_SET)):
+        if print_out:
+            print(f"This n-gram is empty or in the punctuations: {ngram}")
         return False
     if ngram[0].startswith('-') or ngram[-1].endswith('-'):
+        if print_out:
+            print(f"This n-gram is has - : {ngram}")
         return False
+    if print_out:
+        print(f"This is the valid n-gram: {ngram}")
+    
     return True
 
 
@@ -70,7 +85,6 @@ class CoreAnnotator(BaseAnnotator):
             if not has_longer_pattern and len(p.split()) <= MAXGRAMS:
                 cleaned_phrases.add(p)
         phrase2instances = {p: phrase2instances[p] for p in cleaned_phrases}
-
         return phrase2instances
 
     def _mark_corpus(self):

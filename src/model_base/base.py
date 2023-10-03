@@ -61,7 +61,7 @@ class BaseModel(nn.Module):
         raise NotImplementedError
 
     @staticmethod
-    def _par_decode_doc(predicted_doc, threshold):
+    def _par_decode_doc(predicted_doc, threshold, is_phobert: bool = False):
         sents = []
         for predicted_sent in predicted_doc['sents']:
             tokens = consts.LM_TOKENIZER.convert_ids_to_tokens(predicted_sent['ids'])
@@ -74,7 +74,10 @@ class BaseModel(nn.Module):
                 if idxs_set & idxs_taken:
                     continue
                 idxs_taken |= idxs_set
-                phrase = consts.roberta_tokens_to_str(tokens[l_idx: r_idx + 1])
+                if is_phobert:
+                    phrase = consts.phobert_tokens_to_str(tokens[l_idx: r_idx + 1])
+                else:
+                    phrase = consts.roberta_tokens_to_str(tokens[l_idx: r_idx + 1])
                 spans.append([l_idx, r_idx, phrase])
             sents.append({'tokens': tokens, 'spans': spans})
         return sents
@@ -102,14 +105,17 @@ class BaseModel(nn.Module):
         return path_output
 
     @staticmethod
-    def _par_get_doc_cands(predicted_doc, threshold, filter_punc=True):
+    def _par_get_doc_cands(predicted_doc, threshold, filter_punc=True, is_phobert: bool = True):
         cands = set()
         for predicted_sent in predicted_doc['sents']:
             tokens = consts.LM_TOKENIZER.convert_ids_to_tokens(predicted_sent['ids'])
             predicted_spans = predicted_sent['spans']
             for l_idx, r_idx, prob in predicted_spans:
                 if prob > threshold:
-                    cand = consts.roberta_tokens_to_str(tokens[l_idx: r_idx + 1])
+                    if is_phobert:
+                        cand = consts.phobert_tokens_to_str(tokens[l_idx: r_idx + 1])
+                    else:
+                        cand = consts.roberta_tokens_to_str(tokens[l_idx: r_idx + 1])
                     cand = utils.stem_cand(cand)
                     if cand:
                         cands.add(cand)
