@@ -96,7 +96,7 @@ class Experiment:
             test_preprocessor = Preprocessor(
                 path_corpus=self.data_config.path_tagging_docs,
                 num_cores=consts.NUM_CORES,
-                use_cache=True)
+                use_cache=False)
         else:
             test_preprocessor = Preprocessor(
                 path_corpus=self.data_config.path_test,
@@ -114,7 +114,7 @@ class Experiment:
             path_tokenized_id_corpus=test_preprocessor.path_tokenized_id_corpus, 
             dir_output=dir_predict,
             batch_size=1024, 
-            use_cache=True)
+            use_cache=False)
 
         ''' Model Decode and Evaluate'''
         dir_decoded = self.trainer.output_dir / f'{dir_prefix}decoded.epoch-{epoch}'
@@ -125,7 +125,7 @@ class Experiment:
                 path_predicted_docs=path_predicted_docs,
                 output_dir=dir_decoded,
                 threshold=self.config['threshold'],
-                use_cache=True,
+                use_cache=False,
                 use_tqdm=True
             )
             evaluator = evaluate.SentEvaluator()
@@ -137,7 +137,7 @@ class Experiment:
                 path_predicted_docs=path_predicted_docs,
                 output_dir=dir_decoded,
                 expected_num_cands_per_doc=self.data_config.kp_num_candidates_per_doc,
-                use_cache=True,
+                use_cache=False,
                 use_tqdm=True
             )
             evaluator = evaluate.Evaluator()

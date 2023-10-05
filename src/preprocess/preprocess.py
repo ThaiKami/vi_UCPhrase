@@ -1,5 +1,5 @@
 import utils
-from utils import remove_punctuation, remove_emoji
+from utils import remove_punctuation, remove_emoji, remove_G_TOKEN
 import consts
 from tqdm import tqdm
 from pathlib import Path
@@ -57,6 +57,8 @@ class Preprocessor:
         tokenized_id_doc = {'_id_': doc['_id_'], 'sents': []}
         for tokens in cleaned_tokenized_sents:
             widxs = [i for i, token in enumerate(tokens) if token.startswith(consts.GPT_TOKEN)]  # the indices of start of words
+            if is_phobert:
+                tokens = remove_G_TOKEN(tokens)
             ids = consts.LM_TOKENIZER.convert_tokens_to_ids(tokens)
             tokenized_id_doc['sents'].append({'ids': ids, 'widxs': widxs})
 

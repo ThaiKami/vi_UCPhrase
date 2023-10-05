@@ -27,6 +27,7 @@ class Evaluator:
 
         path_doc2cands = Path(path_doc2cands)
         doc2cands = utils.Json.load(path_doc2cands)
+        print()
         assert set(doc2cands.keys()) - consts.DOCIDS_WITH_GOLD == set(doc2golds.keys()) - consts.DOCIDS_WITH_GOLD
         num_cands = 0
         info_list = []

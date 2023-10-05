@@ -29,7 +29,7 @@ class AttmapModel(BaseModel):
         self.feature_extractor = FeatureExtractor(
             output_dir=self.model_dir.parent / 'features',
             num_BERT_layers=self.num_BERT_layers,
-            use_cache=True)
+            use_cache=False)
 
     @property
     def config(self):
@@ -91,7 +91,7 @@ class AttmapModel(BaseModel):
         utils.Log.info(f'Predict: {dir_output}')
         self.eval()
 
-        ''' Decide output path, cachue '''
+        ''' Decide output path, cache '''
         dir_output = Path(dir_output)
         path_predict_docs = Path(path_predict_docs)
         path_prefix = f'{max_num_docs}docs.' * (max_num_docs is not None)

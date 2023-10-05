@@ -12,7 +12,7 @@ def parse_args():
     parser.add_argument("--dir_data", type=str, default='../data/devdata/')
     parser.add_argument("--exp_prefix", type=str, default='', help='additional exp name')
     parser.add_argument("--model_prefix", type=str, default='', help='additional model name')
-    parser.add_argument("--path_model_config", type=str, default='../configs/core.emb.fix.json')
+    parser.add_argument("--path_model_config", type=str, default='../configs/core.CNN.3layers.json')
     args = parser.parse_args()
     return args
 
@@ -65,17 +65,20 @@ HTML_EP = '</span>'
 
 # settings
 MAX_SENT_LEN = 64
-MAX_WORD_GRAM = 20
-MAX_SUBWORD_GRAM = 2
+MAX_WORD_GRAM = 5
+MAX_SUBWORD_GRAM = 10
 NEGATIVE_RATIO = 1
 
 # multiprocessing
-NUM_CORES = 64
+NUM_CORES = 16
 torch.set_num_threads(NUM_CORES)
 
 
 def roberta_tokens_to_str(tokens):
     return ''.join(tokens).replace(GPT_TOKEN, ' ').strip()
 
+def phobert_decode(ids, tokenizer):
+    return tokenizer.decode(ids, skip_special_tokens=True, clean_up_tokenization_spaces = True)
+
 def phobert_tokens_to_str(tokens):
-    return ' '.join(tokens).replace(GPT_TOKEN, ' ').strip()
+    return ' '.join(tokens).replace(GPT_TOKEN, '').strip()

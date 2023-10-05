@@ -61,10 +61,14 @@ class BaseModel(nn.Module):
         raise NotImplementedError
 
     @staticmethod
-    def _par_decode_doc(predicted_doc, threshold, is_phobert: bool = False):
+    def _par_decode_doc(predicted_doc, threshold, is_phobert: bool = True):
         sents = []
         for predicted_sent in predicted_doc['sents']:
-            tokens = consts.LM_TOKENIZER.convert_ids_to_tokens(predicted_sent['ids'])
+            if is_phobert:
+                tokens = (predicted_sent['ids'])
+                # tokens = consts.LM_TOKENIZER.convert_ids_to_tokens(predicted_sent['ids'])
+            else:
+                tokens = consts.LM_TOKENIZER.convert_ids_to_tokens(predicted_sent['ids'])
             predicted_spans = [s for s in predicted_sent['spans'] if s[2] > threshold]
             predicted_spans = sorted(predicted_spans, key=lambda s: (s[1] - s[0], s[2]), reverse=True)
             idxs_taken = set()
@@ -75,7 +79,9 @@ class BaseModel(nn.Module):
                     continue
                 idxs_taken |= idxs_set
                 if is_phobert:
-                    phrase = consts.phobert_tokens_to_str(tokens[l_idx: r_idx + 1])
+                    phrase = consts.phobert_decode(tokens[l_idx: r_idx + 1], consts.LM_TOKENIZER)
+                    # phrase = tokens[l_idx: r_idx + 1]
+                    # phrase = consts.phobert_tokens_to_str(tokens[l_idx: r_idx + 1])
                 else:
                     phrase = consts.roberta_tokens_to_str(tokens[l_idx: r_idx + 1])
                 spans.append([l_idx, r_idx, phrase])
@@ -108,20 +114,27 @@ class BaseModel(nn.Module):
     def _par_get_doc_cands(predicted_doc, threshold, filter_punc=True, is_phobert: bool = True):
         cands = set()
         for predicted_sent in predicted_doc['sents']:
-            tokens = consts.LM_TOKENIZER.convert_ids_to_tokens(predicted_sent['ids'])
+            if is_phobert:
+                tokens = predicted_sent['ids']
+                # tokens =  consts.LM_TOKENIZER.convert_ids_to_tokens(predicted_sent['ids'])
+            else:
+                tokens = consts.LM_TOKENIZER.convert_ids_to_tokens(predicted_sent['ids'])
+
             predicted_spans = predicted_sent['spans']
             for l_idx, r_idx, prob in predicted_spans:
                 if prob > threshold:
                     if is_phobert:
-                        cand = consts.phobert_tokens_to_str(tokens[l_idx: r_idx + 1])
+                        cand = consts.phobert_decode(tokens[l_idx: r_idx + 1], consts.LM_TOKENIZER)
+                        # cand = consts.phobert_tokens_to_str(tokens[l_idx: r_idx + 1])
+                        # cand = tokens[l_idx: r_idx + 1]
                     else:
                         cand = consts.roberta_tokens_to_str(tokens[l_idx: r_idx + 1])
-                    cand = utils.stem_cand(cand)
+                    # cand = utils.stem_cand(cand)
                     if cand:
                         cands.add(cand)
-        if filter_punc:
-            cands = {c for c in cands if not (c[0] in PUNCS or c[-1] in PUNCS)}
-
+        # if filter_punc:
+        #     cands = {c for c in cands if not (c[0] in PUNCS or c[-1] in PUNCS)}
+        
         return list(cands)
 
     @ staticmethod
@@ -185,7 +198,7 @@ class DecodedCorpus:
 
 
 class BaseFeatureExtractor:
-    def __init__(self, output_dir, use_cache=True) -> None:
+    def __init__(self, output_dir, use_cache=False) -> None:
         super().__init__()
         self.use_cache = use_cache
         self.output_dir = Path(output_dir)

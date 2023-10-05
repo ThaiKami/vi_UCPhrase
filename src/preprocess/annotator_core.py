@@ -1,4 +1,5 @@
 import utils
+from utils import remove_G_TOKEN
 import consts
 import string
 import functools
@@ -10,39 +11,30 @@ from preprocess.annotator_base import BaseAnnotator
 import time
 
 
-MINCOUNT = 2
-MINGRAMS = 2
+MINCOUNT = 3
+MINGRAMS = 3
 MAXGRAMS = consts.MAX_WORD_GRAM
 
 
 PUNCS_SET = set(string.punctuation) - {'-'} - {'@'} - {'_'}
 STPWD_SET = set(utils.TextFile.readlines('../data/stopwords.txt'))
-STPWD_SET = {}
+# STPWD_SET = {}
 
 
 
 @functools.lru_cache(maxsize=100000)
-def is_valid_ngram(ngram: list, print_out: bool = True):
+def is_valid_ngram(ngram: list, print_out: bool = False):
     for token in ngram:
-        if not token or token in STPWD_SET or token.isdigit():
-            if print_out:
-                if token in STPWD_SET:
-                    print(f"This n-gram has stws: {ngram}")
-                else:
-                    print(f"This n-gram has digits: {ngram}")
+        # if not token or token in STPWD_SET or token.isdigit():
+        if not token or token in STPWD_SET:
             return False
     charset = set(''.join(ngram))
     if not charset or (charset & (PUNCS_SET)):
-        if print_out:
-            print(f"This n-gram is empty or in the punctuations: {ngram}")
         return False
     if ngram[0].startswith('-') or ngram[-1].endswith('-'):
-        if print_out:
-            print(f"This n-gram is has - : {ngram}")
         return False
     if print_out:
         print(f"This is the valid n-gram: {ngram}")
-    
     return True
 
 
@@ -90,6 +82,7 @@ class CoreAnnotator(BaseAnnotator):
     def _mark_corpus(self):
         tokenized_docs = utils.JsonLine.load(self.path_tokenized_corpus)
         tokenized_id_docs = utils.JsonLine.load(self.path_tokenized_id_corpus)
+        
         phrase2instances_list = utils.Process.par(
             func=CoreAnnotator._par_mine_doc_phrases,
             iterables=list(zip(tokenized_docs, tokenized_id_docs)),
@@ -106,5 +99,5 @@ class CoreAnnotator(BaseAnnotator):
                 for i_sent, l_idx, r_idx in instances:
                     doc['sents'][i_sent]['phrases'].append([[l_idx, r_idx], phrase])
         utils.Json.dump(doc2phrases, self.dir_output / f'doc2phrases.{self.path_tokenized_corpus.stem}.json')
-
+        
         return tokenized_id_docs
