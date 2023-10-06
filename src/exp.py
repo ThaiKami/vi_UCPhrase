@@ -147,7 +147,7 @@ class Experiment:
 
 if __name__ == '__main__':
     exp = Experiment()
-    exp.train()
+    # exp.train()
     best_epoch = exp.select_best_epoch()
     # exp.predict(epoch=best_epoch, for_tagging=True)
     exp.predict(epoch=best_epoch, for_tagging=False)

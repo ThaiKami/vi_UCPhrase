@@ -150,3 +150,53 @@ class FeatureExtractor(BaseFeatureExtractor):
         utils.Pickle.dump(predict_docs, path_output)
 
         return path_output
+    
+    
+    def return_BS(self, path_marked_corpus, max_num_docs=None):
+        marked_docs = utils.JsonLine.load(path_marked_corpus)
+        marked_sents = [sent for doc in marked_docs for sent in doc['sents']]
+        sorted_i_sents = sorted(list(enumerate(marked_sents)), key=lambda tup: len(tup[1]['ids']), reverse=True)
+        marked_sents = [sent for i, sent in sorted_i_sents]
+        sorted_raw_indices = [i for i, sent in sorted_i_sents]
+        rawidx2newidx = {rawidx: newidx for newidx, rawidx in enumerate(sorted_raw_indices)}
+
+        model_outputs = self._get_model_outputs(marked_sents)
+
+        predict_instances = []
+        for i, model_output_dict in tqdm(enumerate(model_outputs), ncols=100, total=len(marked_sents), desc='Generate predict instances'):
+            marked_sent = marked_sents[i]
+            word_idxs = marked_sent['widxs']
+
+            spans = []
+            possible_spans = utils.get_possible_spans(word_idxs, len(marked_sent['ids']), consts.MAX_WORD_GRAM,
+                                                      consts.MAX_SUBWORD_GRAM)
+            for l_idx, r_idx in possible_spans:
+                spanlen = r_idx - l_idx + 1
+                spans.append((l_idx, r_idx, spanlen))
+            predict_instance = {
+                'spans': spans,
+                'ids': marked_sent['ids'],
+                'attmap': model_output_dict.astype(np.float16)
+            }
+
+            predict_instances.append(predict_instance)
+            del model_output_dict
+        predict_instances = [predict_instances[rawidx2newidx[rawidx]] for rawidx in range(len(predict_instances))]
+
+        # pack predict instances into predict docs
+        num_sents_per_doc = [len(doc['sents']) for doc in marked_docs]
+        assert len(predict_instances) == sum(num_sents_per_doc)
+        pointer = 0
+        predict_docs = []
+        for doci, num_sents in enumerate(num_sents_per_doc):
+            predict_docs.append({
+                '_id_': marked_docs[doci]['_id_'],
+                'sents': predict_instances[pointer: pointer + num_sents]})
+            pointer += num_sents
+        assert pointer == len(predict_instances)
+        assert len(predict_docs) == len(marked_docs)
+
+        utils.Pickle.dump(predict_docs, path_output)
+
+        return path_output
+

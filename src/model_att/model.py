@@ -135,3 +135,43 @@ class AttmapModel(BaseModel):
                     'sents': predicted_instances})
         utils.Pickle.dump(predicted_docs, path_output)
         return path_output
+    
+    def predict_Thai(self, path_tokenized_id_corpus, dir_output, batch_size=128, use_cache=True, max_num_docs=None):
+        
+        self.eval()
+
+        ''' Decide output path, cache '''
+
+        predict_docs = utils.Pickle.load(path_predict_docs)
+        predict_docs = predict_docs if max_num_docs is None else predict_docs[:max_num_docs]
+
+        predicted_docs = []
+        with torch.no_grad():
+            for predict_doc in tqdm(predict_docs, ncols=100, desc='predict'):
+                predicted_instances = []
+                for predict_instance in predict_doc['sents']:
+                    spans = predict_instance['spans']
+                    spans = [span for span in spans if span[1] - span[0] + 1 <= self.max_num_subwords]
+                    spans_batches = utils.get_batches(spans, batch_size)
+                    attmap = predict_instance['attmap']
+                    predicted_spans = []
+                    for batch_spans in spans_batches:
+                        span_attmaps = [attmap[:, :, l_idx: r_idx + 1, l_idx: r_idx + 1] for l_idx, r_idx, _ in batch_spans]
+                        span_attmaps = self.pad_attention_maps(span_attmaps, max_num_subwords=self.max_num_subwords)
+                        span_attmaps = span_attmaps.to(DEVICE)
+                        probs = self.get_probs(span_attmaps)
+                        probs = probs.detach().cpu().numpy()
+                        assert len(probs) == len(batch_spans)
+                        for i, (l_idx, r_idx, _) in enumerate(batch_spans):
+                            predicted_spans.append((l_idx, r_idx, probs[i]))
+                    assert len(predicted_spans) == len(spans)
+                    predicted_instance = {
+                        'spans': predicted_spans,
+                        'ids': predict_instance['ids']
+                    }
+                    predicted_instances.append(predicted_instance)
+                predicted_docs.append({
+                    '_id_': predict_doc['_id_'],
+                    'sents': predicted_instances})
+        utils.Pickle.dump(predicted_docs, path_output)
+        return path_output
